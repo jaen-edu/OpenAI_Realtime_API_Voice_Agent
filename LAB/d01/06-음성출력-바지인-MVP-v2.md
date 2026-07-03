@@ -55,6 +55,9 @@
 
 > 어시스턴트가 말하는 중에 내가 말을 시작하면, 서버는 `input_audio_buffer.speech_started`를 보냅니다. 이때 **재생 큐를 비우고**, FastRTC의 **`clear_queue()`**로 이미 전송 대기 중인 오디오까지 지우면 **즉시 조용해집니다.** 서버(VAD)는 알아서 이전 응답 생성을 멈추고 새 발화를 처리합니다.
 
+```my
+WebRTC : UDP 기반, WebSocket : TCP 기반 
+```
 ---
 
 ## STEP 1 — 🔴🟢 오디오 델타 디코드 헬퍼 (TDD)
@@ -86,6 +89,7 @@ def test_decodes_pcm16_audio_delta():
 def test_returns_none_for_non_audio_event():
     # 음성이 아닌 이벤트(자막/완료)에는 None을 돌려줘야 한다.
     assert decode_audio_delta({"type": "response.output_audio_transcript.delta"}) is None
+    # 종료할 때
     assert decode_audio_delta({"type": "response.done"}) is None
 ```
 
@@ -110,7 +114,7 @@ def decode_audio_delta(event: dict) -> np.ndarray | None:
     if event.get("type") != "response.output_audio.delta":
         return None
     # 2) 서버 버전에 따라 base64가 'delta' 또는 'audio' 필드에 올 수 있어 둘 다 대응.
-    #    ('delta'가 있으면 그걸, 없으면 'audio'를 쓴다.)
+    #    ('delta'가 있으면 그걸, 없으면 'audio'를 쓴다.) 최근-delta, 구형-audio
     b64 = event.get("delta") or event.get("audio")
     # 3) 알맹이가 비어 있으면(빈 문자열/None) 안전하게 None.
     if not b64:
@@ -278,6 +282,10 @@ uv run uvicorn voice_app:app --host 127.0.0.1 --port 7860
 
 > 💡 막히면 맨 아래 **🧩 필수 미션 — 풀이** 를 펼쳐 보세요.
 
+```my
+차세대 인터페이스로 음성 각광 - 보안이 이슈 예) 음성코딩 생산성 10배  
+다자간 회의 등 : 음성지문 기술 이용 화자의 identity 구분
+```
 ---
 
 ## ✅ 완성 체크포인트 (= MVP 게이트)
@@ -384,7 +392,7 @@ from voice_agent.adapter.audio_output import decode_audio_delta, is_speech_start
 
 ```python
                 if is_speech_started(event):     # ← 인라인 대신 헬퍼
-                    self._barge_in()
+                    await self._barge_in()
                     continue
 ```
 
@@ -510,7 +518,7 @@ async def test_cancel_sends_response_cancel():
 ### ✅ 미션 완료 확인 (= 진행 게이트)
 
 ```powershell
-uv run pytest
+uv run pytest -v
 ```
 
 **예상 출력** (대략):
