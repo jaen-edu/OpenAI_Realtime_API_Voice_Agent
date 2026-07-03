@@ -1,0 +1,1 @@
+toml파일 변경 시 uv sync 실행

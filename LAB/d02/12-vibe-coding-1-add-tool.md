@@ -3,7 +3,39 @@
 > **이 교시가 끝나면** 1~11교시에서 손으로 쌓은 토대(계층·테스트·가드레일) 위에, **AI 코딩 에이전트와 함께** 새 기능을 빠르고 안전하게 추가합니다. 핵심은 속도가 아니라 **통제**입니다 — AI에게 규칙·스펙·테스트를 먼저 주고, 결과를 리뷰로 검증합니다.
 
 ---
+```my
+source of the truth  ==>spec
+userstory, fr, scope in out, sc(ac)
 
+##AI Workflow
+###SpecKit SDD 구현한 툴로 하네스의 일종 이런 구조가 하네스
+                     clarify로 반복검증                            analyze반복
+constribution     -----> spectity  ---> plan                    --->tasks  ----> implements
+contributeion.md         spec.md     plan.md                      tasks.md     여기부터 AI가 수행
+팀원들이 지켜야하는 원칙  why와 what     기술계획 :클린아키텍처(layer)    작업목록
+(principal - 불변)                   서포트하는 기타 기술문서         순서,병행여부(ptag[p])
+AI와의 관계도 명시                    data-model.md
+(예: 모든 응답은 한글로                research.md(기술장단점이나 대안)
+ Test first TDD)                    ui-contract.md
+
+
+
+ cf) FileSystem 
+ PRD.md --> Tasks.md --> Implementation
+------
+chatbot (물어봐야 답변) ---> agent(목표가 있고 목표에 맞는지 판단하고 실행) ---> Harness1(통제형)
+코드 자동완성                agentic coding(제어가 어려움 주도권:AI)          AI와 협업, 기업형(표준)
+                           prompt,skill,instruction                     예) Speckit
+
+--> Harness2 (자율형)
+    Harness1고도화
+    예) OpenClaw
+       Hermes Agent(자기개선 루틴-자가학습 진화!!!)
+
+ prompt engineering : 의도성과 일관성 중요 반드시 평가하고 개선
+ context engineering : Multi Agent로 인해 context가 분산되어 분산된  context관리
+ harnes engineering : SDD를 개선관리 
+```
 ## 0. 이 교시에 만드는 것 (한눈에)
 
 지금까지는 한 줄씩 직접 쌓았습니다. 이제 그 위에서 **바이브 코딩**으로 새 도구 하나를 몇 분 만에 추가합니다. 단, "AI가 짜준 걸 그냥 붙이기"가 아니라, 우리가 만든 **안전망(테스트·가드레일·계층 경계)**을 그대로 활용해 검증합니다.
@@ -66,7 +98,7 @@ AI:   테스트를 통과시키는 구현(GREEN) → 파이프라인 준수 ← 
 
 ## 테스트 (Test-First TDD)
 - 새 기능은 반드시 실패하는 테스트(RED)부터 쓴다. 그다음 최소 구현(GREEN).
-- pytest 사용. async 테스트는 `async def`.
+- pytest 사용(uv run pytest -v). async 테스트는 `async def`.
 - 기존 테스트를 깨지 않는다(리팩터는 초록 유지).
 
 ## 도구 추가 규약 (8~11교시 패턴)
